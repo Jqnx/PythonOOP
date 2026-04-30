@@ -1,0 +1,16 @@
+{
+  "servers": [
+    {
+      "naam": "google dns",
+      "type": "ping",
+      "target": "8.8.8.8",
+      "interval": 60
+    },
+    {
+      "naam": "cloudflare dns",
+      "type": "ping",
+      "target": "1.1.1.1",
+      "interval": 60
+    }
+  ]
+}

@@ -51,9 +51,15 @@ def main():
                         case 1:
                             monitor.print_servers()
                         case 2:
-                            monitor.add_server()
+                            naam = console.input("Naam: ")
+                            check_type = console.input("Type: ")
+                            target = console.input("Target: ")
+                            interval = int(console.input("Interval: "))
+                            monitor.add_server(naam, check_type, target, interval)
+                            monitor.write_file()
                         case 3:
                             monitor.remove_server()
+                            monitor.write_file()
                         case _:
                             break
 

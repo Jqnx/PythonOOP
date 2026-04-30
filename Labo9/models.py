@@ -1,7 +1,12 @@
+from datetime import datetime
 from rich.console import Console
 from rich.table import Table
+from rich.progress import BarColumn, TaskProgressColumn, TextColumn, Progress
+from json import dump, load
 
 from checks import Check
+
+SERVERS_FILE = "./servers.json"
 
 
 class Server:
@@ -18,12 +23,21 @@ class ServerMonitor:
         self.servers = []
         self.console = console
 
-    def add_server(self):
-        naam = self.console.input("Naam: ")
-        check_type = self.console.input("Type: ")
-        target = self.console.input("Target: ")
-        interval = int(self.console.input("Interval: "))
+        try:
+            with open(SERVERS_FILE, "r", encoding="utf-8") as f:
+                open_file = load(f)
+                for server in open_file.get("servers"):
+                    s = Server(
+                        server.get("naam"),
+                        server.get("type"),
+                        server.get("target"),
+                        server.get("interval"),
+                    )
+                    self.servers.append(s)
+        except FileNotFoundError:
+            pass
 
+    def add_server(self, naam, check_type, target, interval):
         try:
             server = Server(naam, check_type, target, interval)
         except ValueError as e:
@@ -31,7 +45,9 @@ class ServerMonitor:
         else:
             if server not in self.servers:
                 self.servers.append(server)
-            self.console.print("Server toegevoegd.")
+                self.console.print("Server toegevoegd.")
+            else:
+                self.console.print("Server bestaat al.")
 
     def remove_server(self):
         self.print_servers(True)
@@ -63,10 +79,58 @@ class ServerMonitor:
         else:
             self.console.print("Geen servers.")
 
-    def run_checks(self):
-        for server in self.servers:
-            server.check.execute()
+    def write_file(self):
+        s = []
+        try:
+            with open(SERVERS_FILE, "w", encoding="utf-8") as f:
+                for server in self.servers:
+                    s.append(
+                        {
+                            "naam": server.naam,
+                            "type": server.type,
+                            "target": server.target,
+                            "interval": server.interval,
+                        }
+                    )
+                dump({"servers": s}, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            self.console.print(f"Error: {e}")
 
-        # TODO: Print check resultaten
+    def run_checks(self):
+        progress = Progress(
+            TextColumn("{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+        )
+        results = []
+        with progress:
+            for server in progress.track(
+                self.servers, description="Uitvoeren checks..."
+            ):
+                status = server.check.execute()
+                results.append(
+                    {
+                        "server": server.naam,
+                        "status": status,
+                        "timestamp": datetime.isoformat(
+                            datetime.now(), " ", timespec="seconds"
+                        ),
+                    }
+                )
+
+        table = Table()
+        table.add_column("Server")
+        table.add_column("Status")
+        table.add_column("Timestamp")
+        for result in results:
+            status = result.get("status")
+            s = ""
+            if status:
+                s = "[green]✓ OK[/green]"
+            else:
+                s = "[red]✗ Failed[/red]"
+            table.add_row(result.get("server"), s, result.get("timestamp"))
+
+        self.console.print(table)
 
         # TODO: Genereer HTML rapport

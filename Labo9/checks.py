@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
+import subprocess
+import platform
+from urllib.parse import urlparse
 
 
 class Check(ABC):
     @abstractmethod
-    def execute(self):
+    def execute(self) -> bool:
         pass
 
     @classmethod
@@ -21,15 +24,28 @@ class PingCheck(Check):
     def __init__(self, target):
         self.target = target
 
-    def execute(self):
-        pass
+    def execute(self) -> bool:
+        param = "-n" if platform.system().title == "windows" else "-c"
+        command = ["ping", param, "4", self.target]
+
+        try:
+            subprocess.check_output(command)
+            return True
+        except subprocess.CalledProcessError:
+            return False
 
 
 class HTTPCheck(Check):
     type_name = "http"
 
     def __init__(self, target):
-        self.target = target
+        try:
+            result = urlparse(target)
+            if result:
+                self.target = target
+        except ValueError as e:
+            raise e
 
-    def execute(self):
-        pass
+    # TODO: Implement HTTPCheck execute()
+    def execute(self) -> bool:
+        return False
