@@ -11,6 +11,18 @@
       "type": "ping",
       "target": "1.1.1.1",
       "interval": 60
+    },
+    {
+      "naam": "google",
+      "type": "http",
+      "target": "https://google.com",
+      "interval": 120
+    },
+    {
+      "naam": "test",
+      "type": "http",
+      "target": "https://djsakdjasldja.com",
+      "interval": 120
     }
   ]
 }

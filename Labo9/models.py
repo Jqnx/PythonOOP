@@ -7,6 +7,7 @@ from json import dump, load
 from checks import Check
 
 SERVERS_FILE = "./servers.json"
+RESULTS_FILE = "./check_results.json"
 
 
 class Server:
@@ -111,7 +112,8 @@ class ServerMonitor:
                 results.append(
                     {
                         "server": server.naam,
-                        "status": status,
+                        "type": server.type,
+                        "success": status,
                         "timestamp": datetime.isoformat(
                             datetime.now(), " ", timespec="seconds"
                         ),
@@ -123,7 +125,7 @@ class ServerMonitor:
         table.add_column("Status")
         table.add_column("Timestamp")
         for result in results:
-            status = result.get("status")
+            status = result.get("success")
             s = ""
             if status:
                 s = "[green]✓ OK[/green]"
@@ -133,4 +135,13 @@ class ServerMonitor:
 
         self.console.print(table)
 
+        self.write_results(results)
+
         # TODO: Genereer HTML rapport
+
+    def write_results(self, results):
+        try:
+            with open(RESULTS_FILE, "w", encoding="utf-8") as f:
+                dump({"results": results}, f, indent=2)
+        except Exception as e:
+            self.console.print(f"Error: {e}")

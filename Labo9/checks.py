@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import subprocess
 import platform
 from urllib.parse import urlparse
+import requests
 
 
 class Check(ABC):
@@ -46,6 +47,13 @@ class HTTPCheck(Check):
         except ValueError as e:
             raise e
 
-    # TODO: Implement HTTPCheck execute()
     def execute(self) -> bool:
-        return False
+        try:
+            res = requests.get(self.target)
+        except Exception:
+            return False
+        else:
+            if res.status_code == 200:
+                return True
+            else:
+                return False
