@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Report</title>
+        <style>
+            .red {
+                color: red;
+            }
+            .green {
+                color: green;
+            }
+        </style>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                {% for key, value in result.items() %}
+                    {% if key == "success" and value %}
+                        <td class="green">OK</td>
+                    {% elif key == "success" %}
+                        <td class="red">Failed</td>
+                    {% elif key == "type" %}
+                        <td> {{ value.upper() }}</td>
+                    {% else %}
+                        <td> {{ value.capitalize() }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
