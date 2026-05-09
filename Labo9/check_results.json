@@ -4,25 +4,25 @@
       "server": "google dns",
       "type": "ping",
       "success": true,
-      "timestamp": "2026-05-02 16:43:51"
+      "timestamp": "2026-05-09 12:47:48"
     },
     {
       "server": "cloudflare dns",
       "type": "ping",
       "success": true,
-      "timestamp": "2026-05-02 16:43:54"
+      "timestamp": "2026-05-09 12:47:51"
     },
     {
       "server": "google",
       "type": "http",
       "success": true,
-      "timestamp": "2026-05-02 16:43:54"
+      "timestamp": "2026-05-09 12:47:51"
     },
     {
       "server": "test",
       "type": "http",
       "success": false,
-      "timestamp": "2026-05-02 16:43:54"
+      "timestamp": "2026-05-09 12:47:51"
     }
   ]
 }

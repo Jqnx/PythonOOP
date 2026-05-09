@@ -1,13 +1,17 @@
 from datetime import datetime
-from rich.console import Console
-from rich.table import Table
-from rich.progress import BarColumn, TaskProgressColumn, TextColumn, Progress
 from json import dump, load
+
+from jinja2 import Environment, FileSystemLoader
+from rich.console import Console
+from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
+from rich.table import Table
 
 from checks import Check
 
 SERVERS_FILE = "./servers.json"
 RESULTS_FILE = "./check_results.json"
+REPORT_FILE = "./report.html"
+REPORT_TEMPLATE_FILE = "report_template.html.jinja"
 
 
 class Server:
@@ -136,8 +140,7 @@ class ServerMonitor:
         self.console.print(table)
 
         self.write_results(results)
-
-        # TODO: Genereer HTML rapport
+        self.generate_html_report(results)
 
     def write_results(self, results):
         try:
@@ -145,3 +148,10 @@ class ServerMonitor:
                 dump({"results": results}, f, indent=2)
         except Exception as e:
             self.console.print(f"Error: {e}")
+
+    def generate_html_report(self, results):
+        env = Environment(loader=FileSystemLoader("templates"))
+        template = env.get_template(REPORT_TEMPLATE_FILE)
+        html = template.render(results=results)
+        with open(REPORT_FILE, "w", encoding="utf-8") as f:
+            f.write(html)
